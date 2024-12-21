@@ -18,7 +18,8 @@ def lambda_handler(event, context):
     
     # Create the response message
     message = f"Hello {name}! The score is {average_score}."
-    
+    print(message)
+
     # Return the HTTP response
     return {
         "statusCode": 200,
@@ -27,3 +28,9 @@ def lambda_handler(event, context):
             "Content-Type": "application/json"
         }
     }
+
+
+if __name__ == "__main__":
+    event_test = {"queryStringParameters": {"name": "Luciano"}}
+    response = lambda_handler(event_test, None)
+    print(response)
