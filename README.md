@@ -10,6 +10,7 @@ The project will simulate a system for storing and retrieving data about games, 
 
 ## **Learning Objectives**
 - Manage IAM roles and policies effectively to provide secure access to AWS resources.
+- Learn to use uv to manage Python libraries in Lambda deployments.
 - Explore different methods of deploying Lambda functions (ZIP and Docker).
 - Build and maintain robust GitHub Actions workflows for CICD.
 - Use Terraform to define, deploy, and manage infrastructure as code.
