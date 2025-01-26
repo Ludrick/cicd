@@ -1,36 +1,105 @@
 import json
-import pandas as pd
+import boto3
+from datetime import datetime, timezone
+
+s3_client = boto3.client("s3", region_name="us-east-1")
+dynamodb = boto3.resource("dynamodb", region_name="us-east-1")
+
+TABLE_NAME = "cicdproj_calls_bronze_env2"
 
 def lambda_handler(event, context):
-    # Generate a DataFrame with game scores
-    data = {
-        "game": ["Game1", "Game2", "Game3"],
-        "score": [9.2, 8.4, 8.6]  # Example scores
-    }
-    df = pd.DataFrame(data)
-    
-    # Calculate the average score
-    average_score = round(df["score"].mean(), 1)
-    
-    # Handle query parameters
-    query_params = event.get("queryStringParameters", {})
-    name = query_params.get("name", "you")
-    
-    # Create the response message
-    message = f"Hello {name}! The score is {average_score}."
-    print(message)
+    """
+    Lambda handler that is triggered when a new JSON file is placed in the S3
+    bucket. It reads the file content from S3 and stores each record in the
+    'cicdproj_calls_bronze_envx' DynamoDB table.
 
-    # Return the HTTP response
+    Partition Key: ip (String)
+    Sort Key: timestamp (Number)
+    """
+
+    record = event["Records"][0]
+    bucket_name = record["s3"]["bucket"]["name"]
+    object_key = record["s3"]["object"]["key"]
+
+    # Download the object from S3
+    response = s3_client.get_object(Bucket=bucket_name, Key=object_key)
+    file_content = response["Body"].read().decode("utf-8")
+
+    # Parse the JSON
+    try:
+        calls_data = json.loads(file_content)
+    except json.JSONDecodeError:
+        print("Error parsing JSON file.")
+        return {"statusCode": 400, "body": json.dumps({"message": "Invalid JSON format"})}
+
+    # Reference the DynamoDB table
+    table = dynamodb.Table(TABLE_NAME)
+
+    for record_item in calls_data:
+        ip = record_item.get("ip")
+        uf = record_item.get("uf")
+        duration = record_item.get("duration")
+
+        # Use the current UTC epoch (integer) as the sort key
+        current_timestamp = int(datetime.now(timezone.utc).timestamp())
+
+        item = {
+            "ip": ip,
+            "timestamp": current_timestamp,
+            "uf": uf,
+            "duration": duration
+        }
+
+        try:
+            table.put_item(Item=item)
+            print(f"Inserted item: {item}")
+        except Exception as e:
+            print(f"Error inserting item {item}: {str(e)}")
+
     return {
         "statusCode": 200,
-        "body": json.dumps({"message": message}),
-        "headers": {
-            "Content-Type": "application/json"
-        }
+        "body": json.dumps({"message": "Processing complete"})
     }
 
-
 if __name__ == "__main__":
-    event_test = {"queryStringParameters": {"name": "Luciano"}}
-    response = lambda_handler(event_test, None)
-    print(response)
+    from fixtures import event as local_event
+    print("Running locally with fixture event...")
+    response = lambda_handler(local_event, None)
+    print(f"Lambda response: {response}")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

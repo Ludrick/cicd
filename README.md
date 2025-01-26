@@ -35,9 +35,9 @@ The project will simulate the logging of client calls to a server using AWS serv
    - Each JSON file will be automatically processed and moved to the `processed` folder upon upload by a Lambda function.
 
 2. **Lambda Functions and DynamoDB tables:**
-   - **cicdproj_call_extract_envx Lambda:** Deployed as ZIP package and triggered by S3, it will parse the JSON files and save them as raw data in the `cicdproj_calls_bronze_envx` DynamoDB table.
-   - **cicdproj_call_clean_envx Lambda:** Deployed as Docker/ECR and triggered by the `cicdproj_calls_bronze_envx`, it will clean, enrich and save the data in the `cicdproj_calls_silver_envx` DynamoDB table.
-   - **cicdproj_call_aggregate_envx Lambda:** Deployed as Docker/ECR and exposed via an HTTP endpoint to retrieve call information from the `cicdproj_calls_silver_envx` DynamoDB table.
+   - **cicdproj_calls_bronze_envx Lambda:** Deployed as ZIP package and triggered by S3, it will parse the JSON files and save them as raw data in the `cicdproj_calls_bronze_envx` DynamoDB table.
+   - **cicdproj_calls_silver_envx Lambda:** Deployed as Docker/ECR and triggered by the `cicdproj_calls_bronze_envx`, it will clean, enrich and save the data in the `cicdproj_calls_silver_envx` DynamoDB table.
+   - **cicdproj_calls_gold_envx Lambda:** Deployed as Docker/ECR and exposed via an HTTP endpoint to retrieve call information from the `cicdproj_calls_silver_envx` DynamoDB table.
 
 3. **CICD Pipelines:**
    - Automated pipelines in GitHub will manage the entire build and deployment process for the S3, DynamoDB and Lambda functions.

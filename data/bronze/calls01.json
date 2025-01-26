@@ -1,0 +1,18 @@
+[
+    {
+      "ip": "ip101",
+      "uf": "MG",
+      "duration": 25
+    },
+    {
+      "ip": "ip102",
+      "uf": "SP",
+      "duration": 13
+    },
+    {
+      "ip": "ip103",
+      "uf": "SC",
+      "duration": 48
+    }
+  ]
+  
