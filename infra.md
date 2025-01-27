@@ -42,3 +42,62 @@ aws dynamodb create-table `
     --billing-mode PAY_PER_REQUEST `
     --region us-east-1
 ```
+
+
+## Lambda functions:
+
+### Lambda Role: 
+Needs to create the **lambda-exec-role-s3-dynamo** role. Example of permissions for the role:
+ - AmazonDynamoDBFullAccess
+ - AmazonS3FullAccess
+ - AWSLambdaBasicExecutionRole
+
+### Deploying with zip file:
+Needs a requirements.txt with small libraries, since zip deployment has size limitation.
+```
+cd /path/to/cicd/data/bronze
+mkdir libs
+python -m pip install --upgrade -r requirements.txt -t ./libs
+Compress-Archive -Path *.py, libs\* -DestinationPath function.zip
+
+aws lambda create-function `
+  --function-name cicdproj_calls_bronze_env2 `
+  --runtime python3.12 `
+  --role arn:aws:iam::599224842127:role/lambda-exec-role-s3-dynamo `
+  --handler handler.lambda_handler `
+  --zip-file fileb://function.zip `
+  --region us-east-1
+```
+
+
+## S3 Notification for triggering the Lambda:
+
+Create notification.json file:
+```
+{
+  "LambdaFunctionConfigurations": [
+    {
+      "Id": "cicdproj-calls-env2-notification",
+      "LambdaFunctionArn": "arn:aws:lambda:us-east-1:599224842127:function:cicdproj_calls_bronze_env2",
+      "Events": ["s3:ObjectCreated:*"],
+      "Filter": {
+        "Key": {
+          "FilterRules": [
+            { "Name": "prefix", "Value": "landing_zone/" },
+            { "Name": "suffix", "Value": ".json" }
+          ]
+        }
+      }
+    }
+  ]
+}
+
+```
+
+run on PowerShell:
+```
+aws s3api put-bucket-notification-configuration `
+    --bucket cicdproj-calls-env2 `
+    --notification-configuration file://notification.json `
+    --region us-east-1
+```

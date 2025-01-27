@@ -15,7 +15,7 @@ The project will simulate the logging of client calls to a server using AWS serv
 - Build and maintain robust GitHub Actions workflows for CICD.
 - Use Terraform to define, deploy, and manage infrastructure as code.
 - Gain experience with serverless architectures and event-driven systems.
-- Build API server with Flask.
+- Build API with Flask.
 - Pytest
 - CloudWatch
 
