@@ -17,7 +17,7 @@ dynamodb = boto3.resource("dynamodb", region_name="us-east-1")
 
 
 TABLE_NAME = f"cicdproj_calls_bronze_{env}"
-
+print(TABLE_NAME)
 def lambda_handler(event, context):
     """
     Lambda handler that is triggered when a new JSON file is placed in the S3

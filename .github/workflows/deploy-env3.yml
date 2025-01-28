@@ -56,37 +56,23 @@ jobs:
 
 
 
-      # 7) Empacotar sua Lambda em ZIP
       - name: Build Lambda zip
         run: |
-          # 1) Install dependencies into data/bronze/libs
           pip install --upgrade -r data/bronze/requirements.txt -t data/bronze/libs
-          
-          # 2) Zip the entire "data" folder at once.
-          #    This ensures that "data/common" and "data/bronze" are kept.
-          zip -r function.zip data/bronze data/common \
-              -x '*/__pycache__/*'
+          # Now build the ZIP *inside* data/bronze/ so it matches the next step
+          zip -r data/bronze/function.zip data/bronze data/common -x '*/__pycache__/*'
+          unzip -l data/bronze/function.zip
 
-          
-          # Just to confirm what's in the ZIP:
-          unzip -l function.zip
-
-
-
-      # 8) Criar a Lambda Function
       - name: Deploy Lambda function (create or update)
         run: |
           FUNCTION_NAME="cicdproj_calls_bronze_env3"
-          
-          # Check if function exists
+          # Now we reference the zip we just built in data/bronze/
           if aws lambda get-function --function-name $FUNCTION_NAME 2>/dev/null; then
-            echo "Function $FUNCTION_NAME already exists. Updating code..."
             aws lambda update-function-code \
               --function-name $FUNCTION_NAME \
               --zip-file fileb://data/bronze/function.zip \
               --region us-east-1
           else
-            echo "Function $FUNCTION_NAME does not exist. Creating now..."
             aws lambda create-function \
               --function-name $FUNCTION_NAME \
               --runtime python3.12 \
@@ -95,6 +81,7 @@ jobs:
               --zip-file fileb://data/bronze/function.zip \
               --region us-east-1
           fi
+
 
 
 
