@@ -7,16 +7,16 @@ LIBS_DIR = os.path.join(CURRENT_DIR, "libs")
 # Prepend the libs directory to sys.path so Python can find installed packages
 sys.path.insert(0, LIBS_DIR)
 
-
-
 import json
 import boto3
 from datetime import datetime, timezone
+from data.common.config import env
 
 s3_client = boto3.client("s3", region_name="us-east-1")
 dynamodb = boto3.resource("dynamodb", region_name="us-east-1")
 
-TABLE_NAME = "cicdproj_calls_bronze_env2"
+
+TABLE_NAME = f"cicdproj_calls_bronze_{env}"
 
 def lambda_handler(event, context):
     """
@@ -73,7 +73,7 @@ def lambda_handler(event, context):
     }
 
 if __name__ == "__main__":
-    from fixtures import event as local_event
+    from data.bronze.fixtures import event as local_event
     print("Running locally with fixture event...")
     response = lambda_handler(local_event, None)
     print(f"Lambda response: {response}")
