@@ -101,7 +101,7 @@ jobs:
             --action lambda:InvokeFunction \
             --statement-id s3notification \
             --source-arn arn:aws:s3:::cicdproj-calls-env3 \
-            --source-account <YOUR_AWS_ACCOUNT_ID> \
+            --source-account 891376924596 \
             --region us-east-1
 
           # 2) Create notification configuration JSON
