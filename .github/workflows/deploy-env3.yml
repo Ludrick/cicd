@@ -55,15 +55,23 @@ jobs:
           fi
 
 
+
       # 7) Empacotar sua Lambda em ZIP
       - name: Build Lambda zip
         run: |
-          cd data/bronze
-          mkdir libs
-          # Instalar dependências da requirements.txt
-          pip install --upgrade -r requirements.txt -t ./libs
-          # Empacotar
-          zip -r function.zip handler.py libs
+          # 1) Install dependencies into data/bronze/libs
+          pip install --upgrade -r data/bronze/requirements.txt -t data/bronze/libs
+          
+          # 2) Zip the entire "data" folder at once.
+          #    This ensures that "data/common" and "data/bronze" are kept.
+          zip -r function.zip data/bronze data/common \
+              -x '*/__pycache__/*'
+
+          
+          # Just to confirm what's in the ZIP:
+          unzip -l function.zip
+
+
 
       # 8) Criar a Lambda Function
       - name: Deploy Lambda function (create or update)
