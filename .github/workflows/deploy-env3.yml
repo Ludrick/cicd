@@ -92,6 +92,14 @@ jobs:
 
       # 9) Configurar notificação do S3 para chamar a Lambda
       # Needs to add Lambda resource Policy to allow S3 to invoke it
+      - name: Remove existing permission if it exists
+        run: |
+          # This command will fail if the statement doesn't exist; we ignore the error with `|| true`.
+          aws lambda remove-permission \
+            --function-name cicdproj_calls_bronze_env3 \
+            --statement-id s3notification \
+            --region us-east-1 || true
+            
       - name: Configure S3 Notification
         run: |
           # 1) Give S3 permission to invoke the Lambda
