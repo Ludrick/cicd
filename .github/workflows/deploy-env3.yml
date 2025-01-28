@@ -89,30 +89,30 @@ jobs:
 
 
 
-      # # 9) Configurar notificação do S3 para chamar a Lambda
-      # - name: Configure S3 Notification
-      #   run: |
-      #     cat <<EOF > notification_env3.json
-      #     {
-      #       "LambdaFunctionConfigurations": [
-      #         {
-      #           "Id": "cicdproj-calls-env3-notification",
-      #           "LambdaFunctionArn": "arn:aws:lambda:us-east-1:599224842127:function:cicdproj_calls_bronze_env3",
-      #           "Events": ["s3:ObjectCreated:*"],
-      #           "Filter": {
-      #             "Key": {
-      #               "FilterRules": [
-      #                 { "Name": "prefix", "Value": "landing_zone/" },
-      #                 { "Name": "suffix", "Value": ".json" }
-      #               ]
-      #             }
-      #           }
-      #         }
-      #       ]
-      #     }
-      #     EOF
+      # 9) Configurar notificação do S3 para chamar a Lambda
+      - name: Configure S3 Notification
+        run: |
+          cat <<EOF > notification_env3.json
+          {
+            "LambdaFunctionConfigurations": [
+              {
+                "Id": "cicdproj-calls-env3-notification",
+                "LambdaFunctionArn": "arn:aws:lambda:us-east-1:599224842127:function:cicdproj_calls_bronze_env3",
+                "Events": ["s3:ObjectCreated:*"],
+                "Filter": {
+                  "Key": {
+                    "FilterRules": [
+                      { "Name": "prefix", "Value": "landing_zone/" },
+                      { "Name": "suffix", "Value": ".json" }
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+          EOF
 
-      #     aws s3api put-bucket-notification-configuration \
-      #       --bucket cicdproj-calls-env3 \
-      #       --notification-configuration file://notification_env3.json \
-      #       --region us-east-1
+          aws s3api put-bucket-notification-configuration \
+            --bucket cicdproj-calls-env3 \
+            --notification-configuration file://notification_env3.json \
+            --region us-east-1
