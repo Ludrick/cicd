@@ -1,22 +1,16 @@
 name: Deploy to AWS (env3)
-
 on:
   push:
-    branches:
-      - main
-      - master
+    branches: [main]
   workflow_dispatch:
 
 jobs:
   deploy_env3:
     runs-on: ubuntu-latest
-
     steps:
-      # 1) Checar o código
       - name: Checkout
         uses: actions/checkout@v3
 
-      # 2) Configurar as credenciais AWS
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
@@ -24,11 +18,20 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      # 3) Instalar/atualizar AWS CLI (se necessário)
       - name: Install AWS CLI
         run: |
+          # Update package index and install dependencies
           sudo apt-get update
-          sudo apt-get install awscli -y
+          sudo apt-get install -y curl unzip
+          
+          # Download AWS CLI v2
+          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+
+          # Unzip and install
+          unzip awscliv2.zip
+          sudo ./aws/install
+          
+          # Check installation
           aws --version
 
       # 4) Criar bucket S3 (env3)
