@@ -1,17 +1,18 @@
-name: Deploy to AWS (env3)
+name: Deploy to AWS (env3)  # This workflow is named "Deploy to AWS (env3)"
 on:
   push:
-    branches: [main]
-  workflow_dispatch:
+    branches: [main]  # Triggers on push events to the "main" branch
+  workflow_dispatch:  # Allows manual triggering from the Actions tab
 
 jobs:
   deploy_env3:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  # The job will run on the latest Ubuntu runner
+
     steps:
-      - name: Checkout
+      - name: Checkout  # Checks out the repository code so that subsequent steps have access to it
         uses: actions/checkout@v3
 
-      - name: Configure AWS Credentials
+      - name: Configure AWS Credentials  # Configures AWS credentials from GitHub secrets
         uses: aws-actions/configure-aws-credentials@v2
         with:
           # Needs to create the AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY secrets in the repository settings
@@ -19,7 +20,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      - name: Install or Update AWS CLI
+      - name: Install or Update AWS CLI  # Installs or updates the AWS Command Line Interface
         run: |
           sudo apt-get update
           sudo apt-get install -y curl unzip
@@ -30,17 +31,17 @@ jobs:
           aws --version
 
       # 4) Criar bucket S3 (env3)
-      - name: Create S3 bucket
+      - name: Create S3 bucket  # Creates an S3 bucket named "cicdproj-calls-env3"
         run: |
           aws s3api create-bucket --bucket cicdproj-calls-env3 --region us-east-1
 
       # 5) Criar "pastas" (prefixes) no S3
-      - name: Create S3 prefixes
+      - name: Create S3 prefixes  # Creates "landing_zone/" and "processed/" prefixes in the S3 bucket
         run: |
           aws s3api put-object --bucket cicdproj-calls-env3 --key landing_zone/
           aws s3api put-object --bucket cicdproj-calls-env3 --key processed/
 
-      - name: Create DynamoDB table if not exists
+      - name: Create DynamoDB table if not exists  # Creates the DynamoDB table "cicdproj_calls_bronze_env3" if it doesn't already exist
         run: |
           if aws dynamodb describe-table --table-name cicdproj_calls_bronze_env3; then
             echo "Table cicdproj_calls_bronze_env3 already exists. Skipping creation."
@@ -55,7 +56,7 @@ jobs:
           fi
 
       # 6) Create DynamoDB table if not exists
-      - name: Create DynamoDB table if not exists
+      - name: Create DynamoDB table if not exists  # Repeats the same creation logic (could be a duplicated step)
         run: |
           if aws dynamodb describe-table --table-name cicdproj_calls_bronze_env3; then
             echo "Table cicdproj_calls_bronze_env3 already exists. Skipping creation."
@@ -70,7 +71,7 @@ jobs:
           fi
 
     # 7) Build Lambda zip (includes data/bronze + data/common)
-      - name: Build Lambda zip
+      - name: Build Lambda zip  # Builds the ZIP package containing the Lambda code and its dependencies
         run: |
           pip install --upgrade -r data/bronze/requirements.txt -t data/bronze/libs
           zip -r data/bronze/function.zip data/bronze data/common -x '*/__pycache__/*'
@@ -78,7 +79,7 @@ jobs:
           unzip -l data/bronze/function.zip
 
       # 8) Create or update the Lambda function
-      - name: Deploy Lambda function (create or update)
+      - name: Deploy Lambda function (create or update)  # Either creates the Lambda function or updates its code
         run: |
           FUNCTION_NAME="cicdproj_calls_bronze_env3"
           if aws lambda get-function --function-name $FUNCTION_NAME 2>/dev/null; then
@@ -114,7 +115,7 @@ jobs:
 
       # 9) Configurar notificação do S3 para chamar a Lambda
       # Needs to add Lambda resource Policy to allow S3 to invoke it
-      - name: Remove existing permission if it exists
+      - name: Remove existing permission if it exists  # Removes any existing permission statement to avoid conflicts
         run: |
           # This command will fail if the statement doesn't exist; we ignore the error with `|| true`.
           aws lambda remove-permission \
@@ -122,7 +123,7 @@ jobs:
             --statement-id s3notification \
             --region us-east-1 || true
             
-      - name: Configure S3 Notification
+      - name: Configure S3 Notification  # Grants S3 permission to invoke the Lambda and sets up event notifications
         run: |
           # 1) Give S3 permission to invoke the Lambda
           aws lambda add-permission \
