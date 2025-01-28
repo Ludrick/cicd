@@ -113,7 +113,7 @@ jobs:
 
 
 
-      # 9) Configurar notificação do S3 para chamar a Lambda
+      # 9) Configurar notificação do S3 para chamar a Lambda.
       # Needs to add Lambda resource Policy to allow S3 to invoke it
       - name: Remove existing permission if it exists  # Removes any existing permission statement to avoid conflicts
         run: |
