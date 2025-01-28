@@ -1,4 +1,4 @@
-name: Deploy to AWS (env3)  # This workflow is named "Deploy to AWS (env3)"
+name: Deploy to AWS (env3)  # This workflow is named "Deploy to AWS (env3)".
 on:
   push:
     branches: [main]  # Triggers on push events to the "main" branch
