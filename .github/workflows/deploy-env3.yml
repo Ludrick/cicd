@@ -1,3 +1,4 @@
+# This workflow is named "Deploy to AWS (env3)" and triggers on pushes to the main branch or manual dispatch.
 name: Deploy to AWS (env3)
 on:
   push:
@@ -8,38 +9,42 @@ jobs:
   deploy_env3:
     runs-on: ubuntu-latest
     steps:
+      # 1) Check out the repository code to the GitHub Actions runner.
       - name: Checkout
         uses: actions/checkout@v3
 
+      # 2) Configure AWS credentials using the secrets stored in the GitHub repository settings.
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
-          # Needs to create the AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY secrets in the repository settings
+          # Provide AWS credentials from GitHub Secrets and set the default AWS region.
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
+      # 3) Install or update the AWS CLI on the runner to ensure we have a recent version.
       - name: Install or Update AWS CLI
         run: |
           sudo apt-get update
           sudo apt-get install -y curl unzip
           curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
           unzip awscliv2.zip
-          # Run the installer with --update
+          # Run the installer with --update to upgrade any existing AWS CLI installation.
           sudo ./aws/install --update
           aws --version
 
-      # 4) Criar bucket S3 (env3)
+      # 4) Create an S3 bucket for env3. This command will fail if the bucket already exists with the same name.
       - name: Create S3 bucket
         run: |
           aws s3api create-bucket --bucket cicdproj-calls-env3 --region us-east-1
 
-      # 5) Criar "pastas" (prefixes) no S3
+      # 5) Create "prefixes" (folders) within the S3 bucket for storing landing_zone and processed.
       - name: Create S3 prefixes
         run: |
           aws s3api put-object --bucket cicdproj-calls-env3 --key landing_zone/
           aws s3api put-object --bucket cicdproj-calls-env3 --key processed/
 
+      # 6) Check if the DynamoDB table exists; if not, create it. 
       - name: Create DynamoDB table if not exists
         run: |
           if aws dynamodb describe-table --table-name cicdproj_calls_bronze_env3; then
@@ -54,7 +59,7 @@ jobs:
               --region us-east-1
           fi
 
-      # 6) Create DynamoDB table if not exists
+      # 7) Repeat the same check-and-create process for the DynamoDB table, effectively a duplicate step.
       - name: Create DynamoDB table if not exists
         run: |
           if aws dynamodb describe-table --table-name cicdproj_calls_bronze_env3; then
@@ -69,7 +74,7 @@ jobs:
               --region us-east-1
           fi
 
-    # 7) Build Lambda zip (includes data/bronze + data/common)
+    # 8) Build the Lambda zip file, which includes both data/bronze and data/common folders.
       - name: Build Lambda zip
         run: |
           pip install --upgrade -r data/bronze/requirements.txt -t data/bronze/libs
@@ -77,7 +82,7 @@ jobs:
           echo "Contents of the ZIP file:"
           unzip -l data/bronze/function.zip
 
-      # 8) Create or update the Lambda function
+      # 9) Create or update the Lambda function code. If it exists, we update its code; otherwise, we create a new function.
       - name: Deploy Lambda function (create or update)
         run: |
           FUNCTION_NAME="cicdproj_calls_bronze_env3"
@@ -95,7 +100,7 @@ jobs:
             # we need to update it so that it looks for data.bronze.handler.lambda_handler
             aws lambda update-function-configuration \
               --function-name $FUNCTION_NAME \
-              --handler data.bronze.handler.lambda_handler \
+              --handler data.bronze.handler_lambda_handler \
               --region us-east-1
           else
             echo "Creating Lambda function $FUNCTION_NAME ..."
@@ -108,15 +113,10 @@ jobs:
               --region us-east-1
           fi
 
-
-
-
-
-      # 9) Configurar notificação do S3 para chamar a Lambda
-      # Needs to add Lambda resource Policy to allow S3 to invoke it
+      # 10) Remove any existing permission statement for the S3 notification, then add a new one so S3 can invoke this Lambda.
       - name: Remove existing permission if it exists
         run: |
-          # This command will fail if the statement doesn't exist; we ignore the error with `|| true`.
+          # This command fails if the statement doesn't exist, so we add '|| true' to ignore the error.
           aws lambda remove-permission \
             --function-name cicdproj_calls_bronze_env3 \
             --statement-id s3notification \
@@ -124,7 +124,7 @@ jobs:
             
       - name: Configure S3 Notification
         run: |
-          # 1) Give S3 permission to invoke the Lambda
+          # 1) Give S3 permission to invoke the Lambda function.
           aws lambda add-permission \
             --function-name cicdproj_calls_bronze_env3 \
             --principal s3.amazonaws.com \
@@ -134,7 +134,7 @@ jobs:
             --source-account 599224842127 \
             --region us-east-1
 
-          # 2) Create notification configuration JSON
+          # 2) Create JSON configuration that specifies the S3 event trigger for landing_zone/.json files.
           cat <<EOF > notification_env3.json
           {
             "LambdaFunctionConfigurations": [
@@ -155,7 +155,7 @@ jobs:
           }
           EOF
 
-          # 3) Apply notification configuration to the S3 bucket
+          # 3) Apply the notification configuration to the S3 bucket, enabling the Lambda trigger.
           aws s3api put-bucket-notification-configuration \
             --bucket cicdproj-calls-env3 \
             --notification-configuration file://notification_env3.json \
