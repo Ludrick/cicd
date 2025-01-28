@@ -39,7 +39,7 @@ jobs:
           aws s3api put-object --bucket cicdproj-calls-env3 --key landing_zone/
           aws s3api put-object --bucket cicdproj-calls-env3 --key processed/
 
-      # # 6) Criar tabela DynamoDB (env3)
+      # # 6) Criar tabela DynamoDB (env3)..
       # - name: Create DynamoDB table
       #   run: |
       #     aws dynamodb create-table \
