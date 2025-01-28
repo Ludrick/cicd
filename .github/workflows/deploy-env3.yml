@@ -70,6 +70,14 @@ jobs:
           fi
 
     # 7) Build Lambda zip (includes data/bronze + data/common)
+      - name: Build Lambda zip
+        run: |
+          pip install --upgrade -r data/bronze/requirements.txt -t data/bronze/libs
+          zip -r data/bronze/function.zip data/bronze data/common -x '*/__pycache__/*'
+          echo "Contents of the ZIP file:"
+          unzip -l data/bronze/function.zip
+
+      # 8) Create or update the Lambda function
       - name: Deploy Lambda function (create or update)
         run: |
           FUNCTION_NAME="cicdproj_calls_bronze_env3"
