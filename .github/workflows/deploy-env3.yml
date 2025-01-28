@@ -56,32 +56,28 @@ jobs:
 
 
 
-      - name: Build Lambda zip
-        run: |
-          pip install --upgrade -r data/bronze/requirements.txt -t data/bronze/libs
-          # Now build the ZIP *inside* data/bronze/ so it matches the next step
-          zip -r data/bronze/function.zip data/bronze data/common -x '*/__pycache__/*'
-          unzip -l data/bronze/function.zip
-
+      # 8) Create or update the Lambda function
       - name: Deploy Lambda function (create or update)
         run: |
           FUNCTION_NAME="cicdproj_calls_bronze_env3"
-          # Now we reference the zip we just built in data/bronze/
           if aws lambda get-function --function-name $FUNCTION_NAME 2>/dev/null; then
+            echo "Updating Lambda code for $FUNCTION_NAME ..."
             aws lambda update-function-code \
               --function-name $FUNCTION_NAME \
               --zip-file fileb://data/bronze/function.zip \
               --region us-east-1
+            # If you ever need to update config (e.g. handler, runtime, env vars), you can also run:
+            # aws lambda update-function-configuration ...
           else
+            echo "Creating Lambda function $FUNCTION_NAME ..."
             aws lambda create-function \
               --function-name $FUNCTION_NAME \
               --runtime python3.12 \
-              --role arn:aws:iam::<ACCOUNT_ID>:role/lambda-exec-role-s3-dynamo \
+              --role arn:aws:iam::599224842127:role/lambda-exec-role-s3-dynamo \
               --handler data.bronze.handler.lambda_handler \
               --zip-file fileb://data/bronze/function.zip \
               --region us-east-1
           fi
-
 
 
 
