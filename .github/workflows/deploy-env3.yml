@@ -85,7 +85,8 @@ jobs:
               --handler data.bronze.handler.lambda_handler \
               --zip-file fileb://data/bronze/function.zip \
               --region us-east-1
-    fi
+          fi
+
 
 
       # # 9) Configurar notificação do S3 para chamar a Lambda
