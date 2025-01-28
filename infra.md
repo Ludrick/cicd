@@ -101,3 +101,12 @@ aws s3api put-bucket-notification-configuration `
     --notification-configuration file://notification.json `
     --region us-east-1
 ```
+
+
+# Set up Github Action CI/CD:
+1. No seu repositório do GitHub, vá em Settings > Security > Secrets and variables > Actions > New repository secret.
+
+2. Crie dois secrets:
+- AWS_ACCESS_KEY_ID
+- AWS_SECRET_ACCESS_KEY
+
