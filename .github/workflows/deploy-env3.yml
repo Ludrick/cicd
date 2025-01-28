@@ -135,6 +135,9 @@ jobs:
             --source-account 599224842127 \
             --region us-east-1
 
+          # 2) Wait a few seconds to ensure the permission is fully applied
+          sleep 5
+
           # 2) Create notification configuration JSON
           cat <<EOF > notification_env3.json
           {
