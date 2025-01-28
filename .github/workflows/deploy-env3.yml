@@ -87,6 +87,9 @@ jobs:
               --function-name $FUNCTION_NAME \
               --zip-file fileb://data/bronze/function.zip \
               --region us-east-1
+
+          # Wait until AWS reports the function update is complete
+          aws lambda wait function-updated --function-name $FUNCTION_NAME --region us-east-1
             
             # IMPORTANT: if the function was originally created with a different handler,
             # we need to update it so that it looks for data.bronze.handler.lambda_handler
