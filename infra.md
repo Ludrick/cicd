@@ -58,7 +58,24 @@ Needs a requirements.txt with small libraries, since zip deployment has size lim
 cd /path/to/cicd/data/bronze
 mkdir libs
 python -m pip install --upgrade -r requirements.txt -t ./libs
-Compress-Archive -Path *.py, libs\* -DestinationPath function.zip
+
+
+
+1) Vá até a pasta do bronze
+cd "C:\Users\lucia\OneDrive\Documentos\+Data Engineer Learnings\CICD Project\repo\cicd\data\bronze"
+
+2) Remover todos __pycache__ dentro de libs/
+Get-ChildItem .\libs -Recurse -Directory -Filter "__pycache__" | Remove-Item -Recurse -Force
+
+ Se tiver subpastas com __pycache__, o comando acima já remove.
+# Faça o mesmo para o ../common, se existir:
+Get-ChildItem "..\common" -Recurse -Directory -Filter "__pycache__" | Remove-Item -Recurse -Force
+
+3) Compactar handler.py, libs e ..\common em "function.zip"
+Compress-Archive -Path .\handler.py, .\libs, ..\common -DestinationPath function.zip -Force
+
+
+
 
 aws lambda create-function `
   --function-name cicdproj_calls_bronze_env2 `
