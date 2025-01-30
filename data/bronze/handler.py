@@ -43,7 +43,7 @@ def lambda_handler(event, context):
         print("Error parsing JSON file.")
         return {"statusCode": 400, "body": json.dumps({"message": "Invalid JSON format"})}
 
-    # Reference the DynamoDB table
+    # Reference the DynamoDB table.
     table = dynamodb.Table(TABLE_NAME)
 
     for record_item in calls_data:
