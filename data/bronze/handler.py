@@ -4,7 +4,7 @@ import os
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 LIBS_DIR = os.path.join(CURRENT_DIR, "libs")
 
-# Prepend the libs directory to sys.path so Python can find installed packages
+# Prepend the libs directory to sys.path so Python can find installed packages.
 sys.path.insert(0, LIBS_DIR)
 
 import json
@@ -43,7 +43,7 @@ def lambda_handler(event, context):
         print("Error parsing JSON file.")
         return {"statusCode": 400, "body": json.dumps({"message": "Invalid JSON format"})}
 
-    # Reference the DynamoDB table.
+    # Reference the DynamoDB table
     table = dynamodb.Table(TABLE_NAME)
 
     for record_item in calls_data:
