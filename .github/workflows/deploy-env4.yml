@@ -27,12 +27,12 @@ jobs:
 
       - name: Terraform Init
         run: terraform init
-        working-directory: cicd/infra
+        working-directory: infra
 
       - name: Terraform Plan
         run: terraform plan -no-color
-        working-directory: cicd/infra
+        working-directory: infra
 
       - name: Terraform Apply
         run: terraform apply -auto-approve -no-color
-        working-directory: cicd/infra
+        working-directory: infra
