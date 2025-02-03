@@ -135,6 +135,7 @@ resource "aws_lambda_function" "bronze" {
 
   # We'll build 'function.zip' in the pipeline, placed at the repo root 
   filename = "${path.module}/../function.zip"
+  source_code_hash = filebase64sha256("${path.module}/../function.zip")
 
   # If you'd like to set environment variables:
   # environment {
