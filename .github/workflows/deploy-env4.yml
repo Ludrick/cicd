@@ -25,14 +25,27 @@ jobs:
         with:
           terraform_version: 1.5.3
 
+      # 1) Build the Lambda ZIP
+      - name: Build Lambda zip
+        run: |
+          # Install Python dependencies into data/bronze/libs
+          pip install -r data/bronze/requirements.txt -t data/bronze/libs --upgrade
+
+          # Create the zip. We'll exclude __pycache__.
+          zip -r function.zip data/bronze data/common -x "*/__pycache__/*"
+          ls -lh function.zip
+
+      # 2) Initialize Terraform
       - name: Terraform Init
         run: terraform init
         working-directory: infra
 
+      # 3) Terraform Plan
       - name: Terraform Plan
         run: terraform plan -no-color
         working-directory: infra
 
+      # 4) Terraform Apply
       - name: Terraform Apply
         run: terraform apply -auto-approve -no-color
         working-directory: infra
