@@ -1,3 +1,5 @@
+from data.common.config import env
+
 event = {
   "Records": [
     {
@@ -18,13 +20,13 @@ event = {
       },
       "s3": {
         "s3SchemaVersion": "1.0",
-        "configurationId": "cicdproj-calls-env2-notification",
+        "configurationId": f"cicdproj-calls-{env}-notification",
         "bucket": {
-          "name": "cicdproj-calls-env2",
+          "name": f"cicdproj-calls-{env}",
           "ownerIdentity": {
             "principalId": "EXAMPLE"
           },
-          "arn": "arn:aws:s3:::cicdproj-calls-env2"
+          "arn": f"arn:aws:s3:::cicdproj-calls-{env}"
         },
         "object": {
           "key": "landing_zone/calls01.json",

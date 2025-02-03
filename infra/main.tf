@@ -91,14 +91,16 @@ resource "aws_s3_bucket" "calls" {
 ###############################################################################
 # S3 Objects (prefixes)
 ###############################################################################
-resource "aws_s3_bucket_object" "landing_zone_prefix" {
+resource "aws_s3_object" "landing_zone_prefix" {
   bucket = aws_s3_bucket.calls.bucket
   key    = "landing_zone/"
+  content = ""  # Provide empty content
 }
 
-resource "aws_s3_bucket_object" "processed_prefix" {
+resource "aws_s3_object" "processed_prefix" {
   bucket = aws_s3_bucket.calls.bucket
   key    = "processed/"
+  content = ""  # Provide empty content
 }
 
 ###############################################################################
