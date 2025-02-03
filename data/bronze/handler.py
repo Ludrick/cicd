@@ -4,7 +4,7 @@ import os
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 LIBS_DIR = os.path.join(CURRENT_DIR, "libs")
 
-# Prepend the libs directory to sys.path so Python can find installed packages...
+# Prepend the libs directory to sys.path so Python can find installed packages
 sys.path.insert(0, LIBS_DIR)
 
 import json
