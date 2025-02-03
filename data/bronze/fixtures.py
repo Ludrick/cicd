@@ -20,13 +20,13 @@ event = {
       },
       "s3": {
         "s3SchemaVersion": "1.0",
-        "configurationId": f"cicdproj-calls-{env}-notification",
+        "configurationId": "cicdproj-calls-env4-notification",
         "bucket": {
-          "name": f"cicdproj-calls-{env}",
+          "name": "cicdproj-calls-env4",
           "ownerIdentity": {
             "principalId": "EXAMPLE"
           },
-          "arn": f"arn:aws:s3:::cicdproj-calls-{env}"
+          "arn": "arn:aws:s3:::cicdproj-calls-env4"
         },
         "object": {
           "key": "landing_zone/calls01.json",

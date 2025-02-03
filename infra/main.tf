@@ -88,6 +88,14 @@ resource "aws_s3_bucket" "calls" {
   bucket = "cicdproj-calls-${var.env}"
 }
 
+resource "aws_s3_bucket_versioning" "calls_versioning" {
+  bucket = aws_s3_bucket.calls.id
+  
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
 ###############################################################################
 # S3 Objects (prefixes)
 ###############################################################################
