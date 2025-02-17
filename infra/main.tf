@@ -153,7 +153,12 @@ resource "aws_lambda_function" "bronze" {
   # }
 }
 
-
+  resource "aws_lambda_function" "api" {
+  function_name = "cicdproj_calls_api_${var.env}"
+  role          = aws_iam_role.lambda_exec_role_env.arn
+  handler       = "data.api.handler.lambda_handler"
+  runtime       = "python3.12"
+  }
 
 ###############################################################################
 # Lambda Permission: allow S3 to invoke the Lambda
