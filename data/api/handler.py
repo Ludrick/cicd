@@ -1,5 +1,4 @@
 import json
-import pandas as pd
 
 def lambda_handler(event, context):
     # Generate a DataFrame with game scores
@@ -7,16 +6,12 @@ def lambda_handler(event, context):
         "game": ["Game1", "Game2", "Game3"],
         "score": [9.2, 8.4, 8.6]  # Example scores
     }
-    df = pd.DataFrame(data)
-    
-    # Calculate the average score
-    average_score = round(df["score"].mean(), 1)
-    
     # Handle query parameters
     query_params = event.get("queryStringParameters", {})
     name = query_params.get("name", "you")
     
     # Create the response message
+    average_score = sum(data["score"]) / len(data["score"])
     message = f"Hello {name}! The score is {average_score}."
     print(message)
 
