@@ -25,13 +25,22 @@ jobs:
         with:
           terraform_version: 1.5.3
 
-      - name: Build Lambda zip
+      - name: Build Lambda zip bronze
         run: |
           # Install Python deps into data/bronze/libs
           pip install -r data/bronze/requirements.txt -t data/bronze/libs --upgrade
 
           # Zip up data/bronze + data/common, excluding __pycache__
           zip -r function.zip data/bronze data/common -x "*/__pycache__/*"
+          ls -lh function.zip
+
+      - name: Build Lambda zip api
+        run: |
+          # Install Python deps into data/api/libs
+          pip install -r data/api/requirements.txt -t data/api/libs --upgrade
+
+          # Zip up data/api + data/common, excluding __pycache__
+          zip -r function.zip data/api data/common -x "*/__pycache__/*"
           ls -lh function.zip
 
       - name: Terraform Init
