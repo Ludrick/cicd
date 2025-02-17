@@ -1,7 +1,7 @@
 import json
 
 def lambda_handler(event, context):
-    # Generate a DataFrame with game scores
+    # Generate a DataFrame with game scores.
     data = {
         "game": ["Game1", "Game2", "Game3"],
         "score": [9.2, 8.4, 8.6]  # Example scores
