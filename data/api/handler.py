@@ -1,21 +1,21 @@
 import json
 
 def lambda_handler(event, context):
-    # Obtém os parâmetros da query string (se existirem)
+    # Get the query string parameters (if any)
     params = event.get('queryStringParameters') or {}
     number_str = params.get('number')
 
-    # Se não for passado o parâmetro "number", retorna uma mensagem padrão
+    # If the "number" parameter is not provided, return a default message
     if number_str is None:
         return {
             'statusCode': 200,
             'body': json.dumps({
-                'message': 'Bem-vindo à API! Envie um parâmetro "number" para multiplicá-lo por 2.'
+                'message': 'Welcome to the API! Provide a number parameter to multiply it by 2.'
             })
         }
     
     try:
-        # Converte o parâmetro para número (pode ser inteiro ou float)
+        # Convert the parameter to a number (can be integer or float)
         number = float(number_str)
         result = number * 2
         return {
@@ -26,10 +26,24 @@ def lambda_handler(event, context):
             })
         }
     except ValueError:
-        # Caso a conversão falhe, retorna um erro
+        # If conversion fails, return an error
         return {
             'statusCode': 400,
             'body': json.dumps({
-                'error': 'O parâmetro "number" deve ser um número válido.'
+                'error': 'The number parameter must be a valid number.'
             })
         }
+
+
+# Local testing block
+if __name__ == '__main__':
+    # Simulate an event with or without the "number" parameter
+    # Example without parameter:
+    event_default = {"queryStringParameters": None}
+    print("Test without parameter:")
+    print(lambda_handler(event_default, None))
+
+    # Example with the "number" parameter:
+    event_with_number = {"queryStringParameters": {"number": "5"}}
+    print("\nTest with parameter number=5:")
+    print(lambda_handler(event_with_number, None))
