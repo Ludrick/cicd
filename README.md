@@ -1,7 +1,7 @@
 # **CICD Learning Project**
 
 ## **Project Overview**
-
+edittest...
 This repository is a personal project to dive into and level up my skills with AWS resource management, IAM permissions, Docker, GitHub Actions, CICD pipelines, pytest, Cloudwatch and Terraform.
 
 The project will simulate the logging of client calls to a server using AWS services such as ECR, S3, Lambda, DynamoDB, and CloudWatch. Below is an outline of the project's components and goals.
